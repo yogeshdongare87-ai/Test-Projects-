@@ -1,0 +1,287 @@
+/* =====================================================
+   GLOBAL & LAYOUT RESET
+   ===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* =====================================================
+   HEADER NAVBAR
+   ===================================================== */
+.navbar {
+    background-color: #1e293b;
+    color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.search-container input {
+    padding: 8px 12px;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    background-color: #334155;
+    color: #ffffff;
+    outline: none;
+    width: 230px;
+    font-size: 0.875rem;
+}
+
+.search-container input::placeholder {
+    color: #94a3b8;
+}
+
+.search-container input:focus {
+    border-color: #6366f1;
+}
+
+/* =====================================================
+   BUTTON STYLES
+   ===================================================== */
+button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background-color: #4f46e5;
+    color: #ffffff;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #4338ca;
+}
+
+.btn-secondary {
+    background-color: #475569;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background-color: #334155;
+}
+
+.btn-print {
+    background-color: #0284c7;
+    color: #ffffff;
+}
+
+.btn-print:hover {
+    background-color: #0369a1;
+}
+
+#searchBtn {
+    background-color: #10b981;
+    color: #ffffff;
+}
+
+#searchBtn:hover {
+    background-color: #059669;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   DASHBOARD CONTAINER & SIDEBAR
+   ===================================================== */
+.dashboard-container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 56px);
+}
+
+.sidebar {
+    width: 380px;
+    background-color: #f1f5f9;
+    border-right: 1px solid #cbd5e1;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.map-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card h3 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: #334155;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: #ffffff;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+/* =====================================================
+   REPORT PANEL GRID STYLES
+   ===================================================== */
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.stat-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-title {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 2px;
+}
+
+/* =====================================================
+   FEATURE DETAILS PANEL
+   ===================================================== */
+.info-card h2 {
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    font-size: 0.825rem;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #64748b;
+}
+
+.info-value {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.empty-state {
+    color: #94a3b8;
+    font-size: 0.825rem;
+    text-align: center;
+    padding: 12px 0;
+}
+
+.parcel-label {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #4f46e5 !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    padding: 1px 4px !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+}
+
+/* =====================================================
+   PRINT MEDIA STYLESHEET
+   ===================================================== */
+@media print {
+    .navbar, .sidebar, .leaflet-control-container {
+        display: none !important;
+    }
+    .dashboard-container, .map-wrapper, #map {
+        width: 100vw !important;
+        height: 100vh !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+}

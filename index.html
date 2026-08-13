@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Number Maps & Analytics Dashboard</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Geoman CSS (Measuring & Drawing Tools) -->
+    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header class="navbar">
+        <div class="brand">
+            <span class="logo-icon">🗺️</span>
+            <h1>Survey Number Maps Portal</h1>
+        </div>
+        
+        <!-- Search & Quick Action Toolbar -->
+        <div class="search-container">
+            <input type="text" id="surveySearch" placeholder="Enter Survey / Gat No. (e.g. 8 or 8/1)" />
+            <button id="searchBtn">🔍 Search</button>
+            <button id="clearBtn" class="btn-secondary">✖ Clear</button>
+            <button id="printBtn" class="btn-print">🖨️ Print / Save PDF</button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Body -->
+    <div class="dashboard-container">
+        
+        <!-- Left Sidebar Workspace -->
+        <aside class="sidebar">
+            
+            <!-- 1. Location Selection Card -->
+            <div class="card">
+                <h3>📍 Location Selector</h3>
+                
+                <div class="form-group">
+                    <label for="districtSelect">District</label>
+                    <select id="districtSelect">
+                        <option value="">Loading real-time folders...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="talukaSelect">Taluka</label>
+                    <select id="talukaSelect" disabled>
+                        <option value="">Select Taluka</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="villageSelect">Village</label>
+                    <select id="villageSelect" disabled>
+                        <option value="">Select Village</option>
+                    </select>
+                </div>
+
+                <button id="loadMapBtn" class="btn-primary" disabled>🗺️ Load Village Map</button>
+            </div>
+
+            <!-- 2. Village Summary Report Panel -->
+            <div class="card report-card">
+                <h3>📊 Village Summary Report</h3>
+                <div class="report-grid">
+                    <div class="stat-box">
+                        <span class="stat-title">Total Parcels</span>
+                        <span class="stat-value" id="totalParcels">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title">Total Area</span>
+                        <span class="stat-value" id="totalArea">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title">Pakka Road</span>
+                        <span class="stat-value" id="pakkaRoadLen">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title">Kachha Road</span>
+                        <span class="stat-value" id="kachhaRoadLen">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Selected Feature Attribute Details Panel -->
+            <div class="card info-card" id="infoPanel">
+                <h2>📋 Feature Details</h2>
+                <div class="empty-state">Select a parcel (land) or road on the map to see details here.</div>
+            </div>
+
+            <!-- 4. Local GeoJSON File Upload -->
+            <div class="card file-upload-card">
+                <h3>📁 Upload Local GeoJSON</h3>
+                <input type="file" id="geojsonInput" accept=".geojson, .json" />
+            </div>
+
+        </aside>
+
+        <!-- Right Map Workspace -->
+        <main class="map-wrapper">
+            <div id="map"></div>
+        </main>
+
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Geoman JS (Measuring Tools) -->
+    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.min.js"></script>
+    <!-- Turf JS (GIS Area & Distance Engine) -->
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <!-- Custom Application Code -->
+    <script src="app.js"></script>
+</body>
+</html>
