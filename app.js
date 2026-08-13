@@ -59,13 +59,15 @@ const baseLayers = {
 L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
 
 // Add Geoman Measure Controls
-map.pm.addControls({
-    position: 'topleft',
-    drawCircleMarker: false,
-    drawCircle: false,
-    cutPolygon: false,
-    rotateMode: false
-});
+if (map.pm) {
+    map.pm.addControls({
+        position: 'topleft',
+        drawCircleMarker: false,
+        drawCircle: false,
+        cutPolygon: false,
+        rotateMode: false
+    });
+}
 
 // =====================================================
 // ROAD LINE SYMBOLOGY
@@ -90,10 +92,10 @@ function getRoadLineStyle(feature) {
 }
 
 // =====================================================
-// REAL-TIME REPOSITORY DISCOVERY
+// REAL-TIME REPOSITORY DISCOVERY (FIXED PATH PARSING)
 // =====================================================
 async function fetchRepoFoldersRealTime() {
-    districtSelect.innerHTML = `<option value="">Loading real-time folders...</option>`;
+    districtSelect.innerHTML = `<option value="">Loading districts...</option>`;
 
     let url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/git/trees/${GITHUB_BRANCH}?recursive=1`;
 
@@ -111,13 +113,14 @@ async function fetchRepoFoldersRealTime() {
         locationData = {};
 
         data.tree.forEach(item => {
-            const parts = item.path.split("/");
-
-            if (parts.length >= 5 && parts[0].toLowerCase() === "data" && parts[1].toLowerCase() === "maps") {
-                const district = parts[2];
-                const taluka = parts[3];
-                const village = parts[4];
-                const fileName = parts[5] || parts[parts.length - 1];
+            const pathParts = item.path.split("/");
+            
+            // Check for path format: data/maps/District/Taluka/Village/filename.geojson
+            if (pathParts.length >= 5 && pathParts[0].toLowerCase() === "data" && pathParts[1].toLowerCase() === "maps") {
+                const district = pathParts[2];
+                const taluka = pathParts[3];
+                const village = pathParts[4];
+                const fileName = pathParts[pathParts.length - 1];
 
                 if (fileName.toLowerCase().endsWith(".geojson")) {
                     if (!locationData[district]) locationData[district] = {};
@@ -131,6 +134,8 @@ async function fetchRepoFoldersRealTime() {
                         locationData[district][taluka][village].polygonFile = fileName;
                     } else if (lowerName.includes("line")) {
                         locationData[district][taluka][village].lineFile = fileName;
+                    } else if (!locationData[district][taluka][village].polygonFile) {
+                        locationData[district][taluka][village].polygonFile = fileName;
                     }
                 }
             }
@@ -141,7 +146,7 @@ async function fetchRepoFoldersRealTime() {
     } catch (err) {
         console.error("Error fetching repository tree:", err);
         districtSelect.innerHTML = `<option value="">Failed to load folders</option>`;
-        alert("Failed to load real-time folder data from GitHub.");
+        alert("Failed to load map folders from GitHub. Check GitHub username and repo settings.");
     }
 }
 
@@ -150,7 +155,7 @@ function populateDistricts() {
     const districts = Object.keys(locationData).sort();
 
     if (districts.length === 0) {
-        districtSelect.innerHTML = `<option value="">No valid map folders found</option>`;
+        districtSelect.innerHTML = `<option value="">No map folders found</option>`;
         return;
     }
 
@@ -159,32 +164,46 @@ function populateDistricts() {
     });
 }
 
+// DISTRICT CHANGE EVENT
 districtSelect.addEventListener("change", function () {
+    const selectedDist = this.value;
     talukaSelect.innerHTML = `<option value="">Select Taluka</option>`;
     villageSelect.innerHTML = `<option value="">Select Village</option>`;
-    talukaSelect.disabled = !this.value;
-    villageSelect.disabled = true;
-    loadMapBtn.disabled = true;
-
-    if (this.value && locationData[this.value]) {
-        Object.keys(locationData[this.value]).sort().forEach(t => {
+    
+    if (selectedDist && locationData[selectedDist]) {
+        const talukas = Object.keys(locationData[selectedDist]).sort();
+        talukas.forEach(t => {
             talukaSelect.innerHTML += `<option value="${t}">${t}</option>`;
         });
+        talukaSelect.disabled = false;
+    } else {
+        talukaSelect.disabled = true;
     }
+
+    villageSelect.disabled = true;
+    loadMapBtn.disabled = true;
 });
 
+// TALUKA CHANGE EVENT
 talukaSelect.addEventListener("change", function () {
+    const selectedDist = districtSelect.value;
+    const selectedTaluka = this.value;
     villageSelect.innerHTML = `<option value="">Select Village</option>`;
-    villageSelect.disabled = !this.value;
-    loadMapBtn.disabled = true;
 
-    if (this.value && locationData[districtSelect.value][this.value]) {
-        Object.keys(locationData[districtSelect.value][this.value]).sort().forEach(v => {
+    if (selectedDist && selectedTaluka && locationData[selectedDist]?.[selectedTaluka]) {
+        const villages = Object.keys(locationData[selectedDist][selectedTaluka]).sort();
+        villages.forEach(v => {
             villageSelect.innerHTML += `<option value="${v}">${v}</option>`;
         });
+        villageSelect.disabled = false;
+    } else {
+        villageSelect.disabled = true;
     }
+
+    loadMapBtn.disabled = true;
 });
 
+// VILLAGE CHANGE EVENT
 villageSelect.addEventListener("change", function () {
     loadMapBtn.disabled = !this.value;
 });
@@ -203,7 +222,7 @@ async function loadVillageMap() {
     clearMapLayers();
 
     const villageInfo = locationData[d]?.[t]?.[v];
-    if (!villageInfo) return alert("Selected village data is unavailable.");
+    if (!villageInfo) return alert("Selected village map data unavailable.");
 
     const folderPath = `${MAPS_BASE_PATH}/${encodeURIComponent(d)}/${encodeURIComponent(t)}/${encodeURIComponent(v)}`;
     let loadedPolyData = null;
@@ -238,12 +257,12 @@ async function loadVillageMap() {
             showInitialDashboardInfo(d, t, v);
             generateVillageReport(loadedPolyData, loadedLineData);
         } else {
-            alert(`No GeoJSON files found for "${v}".`);
+            alert(`No GeoJSON files could be loaded for village "${v}".`);
         }
 
     } catch (error) {
         console.error("Error fetching map files:", error);
-        alert("Failed to load map layers from GitHub.");
+        alert("Failed to fetch map files from GitHub.");
     }
 }
 
@@ -308,7 +327,7 @@ function selectFeature(feature, layer, type) {
 // =====================================================
 function showFeatureDashboard(properties, type, layer) {
     let title = type === 'polygon' ? "🌾 Parcel / Gat Details" : "🛣️ Road / Line Details";
-    infoPanel.innerHTML = `<h2>${title}</h2>`;
+    infoPanel.innerHTML = `2>${title}</h2>`;
 
     if (type === 'polygon' && layer && layer.toGeoJSON) {
         try {
@@ -445,11 +464,11 @@ clearBtn.addEventListener("click", function () {
 });
 
 // =====================================================
-// STRICT SINGLE SELECTED PARCEL PRINT LOGIC
+// SINGLE SELECTED PARCEL PRINT LOGIC
 // =====================================================
 printBtn.addEventListener("click", function () {
     if (!lastSelectedProperties) {
-        return alert("कृपया पहले नक्शे पर किसी सर्वे नंबर/प्लॉट पर क्लिक करें या सर्च करें, उसके बाद ही प्रिंट लें।");
+        return alert("Please select or search a survey number on the map first before printing.");
     }
 
     const { properties, layer, type } = lastSelectedProperties;
